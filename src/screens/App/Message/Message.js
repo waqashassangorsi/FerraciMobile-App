@@ -43,56 +43,95 @@ const Message = ({navigation, user, route, getpdf}) => {
   };
 
   function useInput() {
-    const [datefrom, setDate] = useState(new Date(null));
+    const [date, setDate] = useState(new Date(null));
     const [dateto, setDateto] = useState(new Date());
-    const [mode, setMode] = useState('datefrom');
-    const [mode1, setMode1] = useState('dateto');
-
+    const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-    const [show1, setShow1] = useState(false);
+    // const [datefrom, setDate] = useState(new Date(null));
+    // const [dateto, setDateto] = useState(new Date());
+    // const [mode, setMode] = useState('datefrom');
+    // const [mode1, setMode1] = useState('dateto');
 
-    console.log('date1', new Date(null));
+    // const [show, setShow] = useState(false);
+    // const [show1, setShow1] = useState(false);
+
+    console.log('date1', date);
     console.log('date2', dateto);
-
-    const showDatepicker = () => {
+    const showMode = currentMode => {
       setShow(true);
-      setMode('currentMode');
+      setMode(currentMode);
     };
-
-    const showMode1 = currentMode => {
-      setShow1(true);
-      setMode1(currentMode);
-    };
-    const showDatepicker1 = () => {
-      showMode1('dateto');
+    const showDatepicker = () => {
+      showMode('date');
     };
 
     const onChange = (event, selectedDate) => {
+      const currentDate = selectedDate || date;
+      setShow(Platform.OS === 'ios');
+      setDate(currentDate);
       settextdate(moment(new Date(null)).format('L'));
-      setDate(new Date());
 
-      const currentDate = selectedDate || datefrom;
-      console.log('mydata123', currentDate);
-      settextdate(moment(new Date(currentDate)).format('L'));
-
-      // settextdate(currentDate);
-      //return false;
-      const dt = Date.parse(currentDate);
-
-      const converttimestamp = dt / 1;
-      setDate(converttimestamp);
-      console.log('firstchecktimestamp', converttimestamp);
+      // const dt = Date.parse(currentDate);
+      // const converttimestamp = dt / 1;
+      // setDate(converttimestamp);
+      // console.log('firstchecktimestamp', converttimestamp);
+      // console.log('checkdate', datefrom);
     };
-
     const onChange1 = (event, selectedDate) => {
       const currentDate = selectedDate || dateto;
-      // settextdateto(currentDate);
-      setShow1(Platform.OS === 'ios');
-      const dt = Date.parse(currentDate);
-      const converttimestamp = dt / 1;
-      setDateto(converttimestamp);
-      console.log('firstchecktimestampto', converttimestamp);
+      setShow(Platform.OS === 'ios');
+      setDateto(currentDate);
+
+      settextdateto(moment(new Date(currentDate)).format('L'));
+      // const dt = Date.parse(currentDate);
+      // const converttimestamp = dt / 1;
+      // setDateto(converttimestamp);
+      // console.log('firstchecktimestampto', converttimestamp);
     };
+    // const showDatepicker = () => {
+    //   setShow(true);
+    //   setMode('datefrom');
+    // };
+
+    // const showMode1 = currentMode => {
+    //   setShow1(true);
+    //   setMode1(currentMode);
+    // };
+    // const showDatepicker1 = () => {
+    //   showMode1('dateto');
+    // };
+    // const hideDatePicker = () => {
+    //   setShow(false);
+    // };
+    // const hideDatePicker1 = () => {
+    //   setShow1(false);
+    // };
+    // const onChange = (event, selectedDate) => {
+    //   hideDatePicker();
+    //   settextdate(moment(new Date(null)).format('L'));
+    //   setDate(new Date());
+    //   const currentDate = selectedDate || datefrom;
+    //   console.log('mydata123', currentDate);
+
+    //   settextdate(moment(new Date(currentDate)).format('L'));
+    //   const dt = Date.parse(currentDate);
+    //   const converttimestamp = dt / 1;
+    //   setDate(converttimestamp);
+    //   console.log('firstchecktimestamp', converttimestamp);
+    //   console.log('checkdate', datefrom);
+    // };
+
+    // const onChange1 = (event, selectedDate) => {
+    //   hideDatePicker1();
+    //   const currentDate = selectedDate || dateto;
+
+    //   settextdateto(moment(new Date(currentDate)).format('L'));
+    //   setShow1(Platform.OS === 'ios');
+    //   const dt = Date.parse(currentDate);
+    //   const converttimestamp = dt / 1;
+    //   setDateto(converttimestamp);
+    //   console.log('firstchecktimestampto', converttimestamp);
+    // };
 
     useEffect(() => {
       setLoading(true);
@@ -118,25 +157,22 @@ const Message = ({navigation, user, route, getpdf}) => {
           console.log('firstlist', arr);
           let arr1 = [];
           for (let i = 0; i < arr.length - 1; i++) {
-            if (arr[i].date >= datefrom && arr[i].date <= dateto) {
+            if (arr[i].date >= date && arr[i].date <= dateto) {
               arr1.push(arr[i]);
             }
           }
           setlistitem(arr1);
-          console.log('first123', arr1);
+          console.log('first1234', arr1);
         },
       );
-    }, [datefrom, dateto]);
+    }, [date, dateto]);
 
     return {
-      datefrom,
+      date,
       dateto,
       showDatepicker,
-      showDatepicker1,
       show,
-      show1,
       mode,
-      mode1,
       onChange,
       onChange1,
       input,
@@ -160,7 +196,7 @@ const Message = ({navigation, user, route, getpdf}) => {
         {item.type == 2 && (
           <View style={styles.item1}>
             <Text style={styles.title}>{item.body}</Text>
-            <Text style={styles.title2}>
+            <Text style={styles.title3}>
               {moment(date1).format('MMMM Do YYYY, h:mm')}
             </Text>
           </View>
@@ -178,7 +214,7 @@ const Message = ({navigation, user, route, getpdf}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+    <View style={{flex: 1, backgroundColor: '#e6eaea'}}>
       <View
         style={{
           flexDirection: 'row',
@@ -187,7 +223,7 @@ const Message = ({navigation, user, route, getpdf}) => {
           alignItems: 'center',
         }}>
         <TouchableOpacity style={() => navigation.navigate('PrivacyPolicy')}>
-          <Image source={arrowback} />
+          <Image source={arrowback} style={{tintColor: '#435f7a'}} />
         </TouchableOpacity>
         <Text
           style={{
@@ -213,12 +249,10 @@ const Message = ({navigation, user, route, getpdf}) => {
             justifyContent: 'space-evenly',
           }}>
           <View style={{}}>
-            <Text style={{color: 'red', fontSize: 14}}>From</Text>
+            <Text style={{color: '#435f7a', fontSize: 14}}>From</Text>
           </View>
           <TouchableOpacity
-            onPress={() => {
-              input.showDatepicker();
-            }}
+            onPress={input.showDatepicker}
             title={'from date'}
             style={{
               borderBottomColor: 'black',
@@ -236,10 +270,10 @@ const Message = ({navigation, user, route, getpdf}) => {
             justifyContent: 'space-evenly',
           }}>
           <View style={{}}>
-            <Text style={{color: 'red', fontSize: 14}}>To</Text>
+            <Text style={{color: '#435f7a', fontSize: 14}}>To</Text>
           </View>
           <TouchableOpacity
-            onPress={input2.showDatepicker1}
+            onPress={input2.showDatepicker}
             title={'to date'}
             style={{
               borderBottomColor: 'black',
@@ -252,7 +286,7 @@ const Message = ({navigation, user, route, getpdf}) => {
         <View
           style={{
             width: '25%',
-            backgroundColor: 'tomato',
+            backgroundColor: '#435f7a',
             flexDirection: 'row',
             alignItems: 'center',
             height: 30,
@@ -272,18 +306,18 @@ const Message = ({navigation, user, route, getpdf}) => {
       {input.show && (
         <DateTimePicker
           testID="dateTimePicker1"
-          value={input.datefrom}
+          value={input.date}
           mode={input.mode}
           is24Hour={true}
           display="default"
           onChange={input.onChange}
         />
       )}
-      {input2.show1 && (
+      {input2.show && (
         <DateTimePicker
           testID="dateTimePicker2"
           value={input2.dateto}
-          mode={input2.mode1}
+          mode={input2.mode}
           is24Hour={true}
           display="default"
           onChange={input2.onChange1}
@@ -304,7 +338,7 @@ const Message = ({navigation, user, route, getpdf}) => {
 const styles = StyleSheet.create({
   item: {
     width: '70%',
-    backgroundColor: `#707070`,
+    backgroundColor: `#f5f5f5`,
     marginHorizontal: 16,
     marginVertical: 8,
     borderRadius: 10,
@@ -312,10 +346,10 @@ const styles = StyleSheet.create({
   },
   item1: {
     width: '70%',
-    backgroundColor: `#ff5656`,
+    backgroundColor: `#435f7a`,
     marginHorizontal: 16,
     marginVertical: 8,
-    alignItems: 'flex-start',
+    // alignItems: 'flex-start',
     marginLeft: '25%',
     borderRadius: 10,
     padding: 10,
@@ -327,9 +361,14 @@ const styles = StyleSheet.create({
   },
   title1: {
     fontSize: 16,
-    color: 'white',
+    color: 'black',
   },
   title2: {
+    fontSize: 10,
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  title3: {
     fontSize: 10,
     color: 'white',
     fontWeight: 'bold',

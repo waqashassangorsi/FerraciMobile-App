@@ -11,6 +11,7 @@ import Splash from './src/screens/Auth/Splash';
 import {LogBox} from 'react-native';
 import PrivacyPolicy from './src/screens/App/PrivacyPolicy';
 import Message from './src/screens/App/Message/Message';
+import CheckSecreen from './src/screens/App/CheckSecreen';
 LogBox.ignoreAllLogs();
 function AppNav({route}) {
   return (
@@ -31,6 +32,11 @@ function AppNav({route}) {
         <Stack.Screen
           name="PrivacyPolicy"
           component={PrivacyPolicy}
+          options={{headerShown: false, animationEnabled: true}}
+        />
+        <Stack.Screen
+          name="CheckSecreen"
+          component={CheckSecreen}
           options={{headerShown: false, animationEnabled: true}}
         />
       </Stack.Navigator>

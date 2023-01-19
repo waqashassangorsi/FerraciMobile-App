@@ -99,7 +99,6 @@ const PrivacyPolicy = ({user}) => {
     }, []),
   );
 
-
   const renderItem = ({item, index}) => {
     let colors = ['#e7eaf1', '#f4f7fe'];
     return (
@@ -131,7 +130,10 @@ const PrivacyPolicy = ({user}) => {
           alignItems: 'center',
           marginTop: '12%',
         }}>
-        <Image source={headercolor} style={{height: 150}} />
+        <Image
+          source={headercolor}
+          style={{height: 150, tintColor: '#435f7a'}}
+        />
         <Text
           style={{position: 'absolute', color: 'white', fontSize: 20, top: 10}}>
           Messages
