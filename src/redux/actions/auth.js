@@ -605,7 +605,11 @@ export const get_county = (data, auth) => {
 };
 export const getpdf = (data, rsl, rej) => {
   return async dispatch => {
-    const res = await axios.post(`${storeurl}pdf_api`, data, {});
+    const res = await axios.post(
+      'http://messagewebsite.book2say.com/wp-json/whatsapp_template/v1/latestpdfdesign_api',
+      data,
+      {},
+    );
     // console.log('firstpdf', res);
 
     return res;

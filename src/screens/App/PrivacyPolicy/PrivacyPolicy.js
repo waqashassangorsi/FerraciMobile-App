@@ -16,7 +16,6 @@ import SmsAndroid from 'react-native-get-sms-android';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {headercolor} from '../../../assets';
 import {Loading} from '../../../components/Loading';
-
 const Item = ({title}) => (
   <View>
     <Text style={styles.title}>{title}</Text>
@@ -121,6 +120,7 @@ const PrivacyPolicy = ({user}) => {
       </TouchableOpacity>
     );
   };
+
   return (
     <View style={{backgroundColor: 'white'}}>
       <View

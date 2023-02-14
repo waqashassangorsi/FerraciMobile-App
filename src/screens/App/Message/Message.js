@@ -7,6 +7,8 @@ import {
   Button,
   Image,
   Pressable,
+  Alert,
+  Linking,
 } from 'react-native';
 //redux
 import {signin, signupwithfb, getpdf} from '../../../redux/actions/auth';
@@ -18,9 +20,15 @@ import {Headers1} from '../../../components/Headers1';
 import moment from 'moment';
 import {arrowback} from '../../../assets';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Loading} from '../../../components/Loading';
-
-const Message = ({navigation, user, route, getpdf}) => {
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import PDFView from 'react-native-view-pdf';
+import * as OpenAnything from 'react-native-openanything';
+import colors from '../../../theme/colors';
+import {useNavigation} from '@react-navigation/native';
+const Message = ({user, route, getpdf}) => {
+  const navigation = useNavigation();
   const [listitem, setlistitem] = useState([]);
   const [listingthread, setlistingthread] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,32 +36,86 @@ const Message = ({navigation, user, route, getpdf}) => {
   const {showmessage, showaddress} = route.params;
   const input = useInput(new Date());
   const input2 = useInput(new Date());
+  const filter = useInput();
   const [textdate, settextdate] = useState();
   const [textdateto, settextdateto] = useState();
-  console.log('firstitem123', JSON.stringify(listitem));
+  const [datetimestamp, setdatetimestamp] = useState();
+  const [datetimestampto, setdatetimestampto] = useState();
+
+  const [pdfuri, setpdfuri] = useState();
+  console.log('pdfuri', pdfuri);
+
   const pdfGenerate = async id => {
-    const formData = new FormData();
-    var myJSON = JSON.stringify(listitem);
-    console.log('firstitem123', myJSON);
-    formData.append('text', JSON.stringify(listitem));
     setLoading(true);
-    const res = await getpdf(formData);
-    setLoading(false);
+    // const formData = new FormData();
+    // formData.append('text', JSON.stringify(listitem));
+    const res = await getpdf();
     console.log('firstjson', res);
+    if (res.data.status == true) {
+      Linking.openURL(res.data.data);
+      setLoading(false);
+    } else {
+      alert(res.data.message);
+    }
   };
 
+  // const generatePDF = async () => {
+  //   try {
+  //     const html = `
+  //       <html>
+  //      <body style= "background-image: url('http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/back05.jpg');">
+  //         ${listitem
+  //           .map(line =>
+  //             line.type == 2
+  //               ? `
+  //               <ul style="padding-left:0px">
+  //                   <li  style="display:inline-block;clear:both;margin: 15px 15px 5px 15px;width:100%;">
+  //                   <div style="background: #435F7A;display: inline-block;padding: 10px 15px;border-radius: 20px;width:50%;line-height: 130%;padding-bottom:25px !important">
+  //                 <p style="color:#f5f5f5;">${line.body}</p>
+  //                 <p style="color:#f5f5f5;">` +
+  //                 moment(new Date(line.date)).format('MMMM Do YYYY, h:mm') +
+  //                 `</p>
+
+  //                  </div>
+  //                  </li>
+  //                 `
+  //               : `
+  //                   <li  style="display:inline-block;clear: both;margin: 15px 15px 5px 15px;width:100%;">
+  //                   <div style="background: #F5F5F5;float:right;display: inline-block;padding: 10px 15px;border-radius: 20px;width: 50%;line-height: 130%;margin-right:30px;padding-bottom:25px  !important">
+  //                   <p>${line.body}</p>
+
+  //                   <p>` +
+  //                 moment(new Date(line.date)).format('MMMM Do YYYY, h:mm') +
+  //                 `</p>
+  //                   </div></li></ul>
+  //                  `,
+  //           )
+  //           .join('')}
+  //           <div style="text-align:center;font-size:20px;color:red;left:0;right:0;margin:0 auto;position:fixed;bottom:0">
+  //           <a href="https://printmymessages.com/"  >Print by https://printmymessages.com</a></div>
+  //      </body>
+  //       </html>
+  //     `;
+  //     const options = {
+  //       html,
+  //       fileName: `test`,
+  //       directory: 'docs',
+  //     };
+  //     const file = await RNHTMLtoPDF.convert(options);
+
+  //     Alert.alert('Success', `PDF saved to ${file.filePath}`);
+  //     Linking.openURL('File://' + file.filePath);
+  //     setpdfuri(file.filePath);
+  //   } catch (error) {
+  //     Alert.alert('Error', error.message);
+  //   }
+  // };
+
   function useInput() {
-    const [date, setDate] = useState(new Date(null));
+    const [date, setDate] = useState(new Date('2022-01-01'));
     const [dateto, setDateto] = useState(new Date());
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-    // const [datefrom, setDate] = useState(new Date(null));
-    // const [dateto, setDateto] = useState(new Date());
-    // const [mode, setMode] = useState('datefrom');
-    // const [mode1, setMode1] = useState('dateto');
-
-    // const [show, setShow] = useState(false);
-    // const [show1, setShow1] = useState(false);
 
     console.log('date1', date);
     console.log('date2', dateto);
@@ -69,13 +131,14 @@ const Message = ({navigation, user, route, getpdf}) => {
       const currentDate = selectedDate || date;
       setShow(Platform.OS === 'ios');
       setDate(currentDate);
-      settextdate(moment(new Date(null)).format('L'));
-
-      // const dt = Date.parse(currentDate);
-      // const converttimestamp = dt / 1;
+      settextdate(moment(new Date(currentDate)).format('L'));
+      console.log('checkdate', currentDate);
+      const dt = Date.parse(currentDate);
+      const converttimestamp = dt / 1;
       // setDate(converttimestamp);
-      // console.log('firstchecktimestamp', converttimestamp);
+      console.log('firstchecktimestamp', converttimestamp);
       // console.log('checkdate', datefrom);
+      setdatetimestamp(converttimestamp);
     };
     const onChange1 = (event, selectedDate) => {
       const currentDate = selectedDate || dateto;
@@ -83,89 +146,12 @@ const Message = ({navigation, user, route, getpdf}) => {
       setDateto(currentDate);
 
       settextdateto(moment(new Date(currentDate)).format('L'));
-      // const dt = Date.parse(currentDate);
-      // const converttimestamp = dt / 1;
+      const dt = Date.parse(currentDate);
+      const converttimestamp = dt / 1;
       // setDateto(converttimestamp);
+      setdatetimestampto(converttimestamp);
       // console.log('firstchecktimestampto', converttimestamp);
     };
-    // const showDatepicker = () => {
-    //   setShow(true);
-    //   setMode('datefrom');
-    // };
-
-    // const showMode1 = currentMode => {
-    //   setShow1(true);
-    //   setMode1(currentMode);
-    // };
-    // const showDatepicker1 = () => {
-    //   showMode1('dateto');
-    // };
-    // const hideDatePicker = () => {
-    //   setShow(false);
-    // };
-    // const hideDatePicker1 = () => {
-    //   setShow1(false);
-    // };
-    // const onChange = (event, selectedDate) => {
-    //   hideDatePicker();
-    //   settextdate(moment(new Date(null)).format('L'));
-    //   setDate(new Date());
-    //   const currentDate = selectedDate || datefrom;
-    //   console.log('mydata123', currentDate);
-
-    //   settextdate(moment(new Date(currentDate)).format('L'));
-    //   const dt = Date.parse(currentDate);
-    //   const converttimestamp = dt / 1;
-    //   setDate(converttimestamp);
-    //   console.log('firstchecktimestamp', converttimestamp);
-    //   console.log('checkdate', datefrom);
-    // };
-
-    // const onChange1 = (event, selectedDate) => {
-    //   hideDatePicker1();
-    //   const currentDate = selectedDate || dateto;
-
-    //   settextdateto(moment(new Date(currentDate)).format('L'));
-    //   setShow1(Platform.OS === 'ios');
-    //   const dt = Date.parse(currentDate);
-    //   const converttimestamp = dt / 1;
-    //   setDateto(converttimestamp);
-    //   console.log('firstchecktimestampto', converttimestamp);
-    // };
-
-    useEffect(() => {
-      setLoading(true);
-      const filter = {
-        box: '',
-        read: 1,
-        indexFrom: 0,
-        maxCount: 2000,
-
-        thread_id: showmessage,
-      };
-      SmsAndroid.list(
-        JSON.stringify(filter),
-        fail => {
-          console.log('Failed with this error: ' + fail);
-        },
-        (count, smsList) => {
-          console.log('Count: ', count);
-          console.log('List: ', JSON.parse(smsList));
-          var arr = JSON.parse(smsList);
-          setLoading(false);
-          // setlistitem(arr);
-          console.log('firstlist', arr);
-          let arr1 = [];
-          for (let i = 0; i < arr.length - 1; i++) {
-            if (arr[i].date >= date && arr[i].date <= dateto) {
-              arr1.push(arr[i]);
-            }
-          }
-          setlistitem(arr1);
-          console.log('first1234', arr1);
-        },
-      );
-    }, [date, dateto]);
 
     return {
       date,
@@ -179,34 +165,90 @@ const Message = ({navigation, user, route, getpdf}) => {
       input2,
     };
   }
-  console.log('firstmessage', showmessage);
-  console.log('firstaddress', showaddress);
+  useEffect(() => {
+    setLoading(true);
+    filtermessage();
+  }, []);
+  const filtermessage = () => {
+    setlistitem('');
+    const filter = {
+      box: '',
+      read: 1,
+      indexFrom: 0,
+      maxCount: 2000,
+      thread_id: showmessage,
+    };
+    SmsAndroid.list(
+      JSON.stringify(filter),
+      fail => {
+        console.log('Failed with this error: ' + fail);
+      },
+      (count, smsList) => {
+        console.log('Count: ', count);
+        console.log('List: ', JSON.parse(smsList));
+        var arr = JSON.parse(smsList);
+        setLoading(false);
+        // setlistitem(arr);
+        console.log('firstlist', arr);
+
+        let arr1 = [];
+
+        for (let i = 0; i < arr.length - 1; i++) {
+          let obj = {};
+          if (arr[i].type == 1) {
+            obj['isme'] = 'No';
+          } else {
+            obj['isme'] = 'Yes';
+          }
+
+          const date = moment(arr[i].date).format('YYYY-MM-DD, h:m');
+
+          obj['timestamp'] = arr[i].date;
+          obj['date'] = date;
+          obj['text'] = arr[i].body;
+          obj['id'] = i;
+
+          if (datetimestamp && datetimestampto) {
+            if (
+              arr[i].date >= datetimestamp &&
+              arr[i].date <= datetimestampto
+            ) {
+              arr1.push(obj);
+            }
+          } else {
+            arr1.push(obj);
+          }
+        }
+
+        setlistitem(arr1);
+      },
+    );
+  };
+  const filterbutton = () => {
+    if (!datetimestamp || !datetimestampto) {
+      alert('Please select the date');
+    } else {
+      filtermessage();
+    }
+  };
+
+  console.log('myallmessages', listitem);
 
   const renderItem = ({item}) => {
-    var timestamp = item.date_sent;
-    var date = new Date(timestamp);
-    // console.log('Date1', date.getTime());
-    // console.log('Date', date);
-    var timestamp1 = item.date;
-    var date1 = new Date(timestamp1);
-    // console.log('Date1', date.getTime());
-    // console.log('Date', date1);
+    console.log('first12345', item);
+
     return (
       <View>
-        {item.type == 2 && (
+        {item.isme == 'Yes' && (
           <View style={styles.item1}>
-            <Text style={styles.title}>{item.body}</Text>
-            <Text style={styles.title3}>
-              {moment(date1).format('MMMM Do YYYY, h:mm')}
-            </Text>
+            <Text style={styles.title}>{item.text}</Text>
+            <Text style={styles.title3}>{item.date}</Text>
           </View>
         )}
-        {item.type == 1 && (
+        {item.isme == 'No' && (
           <View style={styles.item}>
-            <Text style={styles.title1}>{item.body}</Text>
-            <Text style={styles.title2}>
-              {moment(date).format('MMMM Do YYYY, h:mm')}
-            </Text>
+            <Text style={styles.title1}>{item.text}</Text>
+            <Text style={styles.title2}>{item.date}</Text>
           </View>
         )}
       </View>
@@ -219,16 +261,22 @@ const Message = ({navigation, user, route, getpdf}) => {
         style={{
           flexDirection: 'row',
           marginVertical: 20,
-          marginHorizontal: 20,
+          marginHorizontal: 10,
           alignItems: 'center',
         }}>
-        <TouchableOpacity style={() => navigation.navigate('PrivacyPolicy')}>
-          <Image source={arrowback} style={{tintColor: '#435f7a'}} />
-        </TouchableOpacity>
+        <Ionicons
+          name={'chevron-back'}
+          size={24}
+          color={colors.secondary}
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{paddingTop: 4}}
+        />
+
         <Text
           style={{
             color: 'black',
-            marginLeft: 10,
             fontSize: 16,
             fontWeight: 'bold',
           }}>
@@ -291,18 +339,37 @@ const Message = ({navigation, user, route, getpdf}) => {
             alignItems: 'center',
             height: 30,
             borderRadius: 3,
+            justifyContent: 'center',
           }}>
-          <Fontisto
-            name="share-a"
-            color={'white'}
-            size={10}
-            style={{marginLeft: 5}}
-          />
-          <TouchableOpacity onPress={() => pdfGenerate()}>
-            <Text style={{color: 'white', marginLeft: 5}}>Export</Text>
+          <Fontisto name="share-a" color={'white'} size={10} style={{}} />
+
+          <TouchableOpacity onPress={() => filterbutton()}>
+            <Text style={{color: 'white', marginLeft: 5}}>Filter</Text>
           </TouchableOpacity>
         </View>
       </View>
+      {/* <View
+        style={{
+          backgroundColor: 'red',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}> */}
+      <TouchableOpacity
+        style={{
+          height: 35,
+          width: '30%',
+          backgroundColor: '#435f7a',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginLeft: 100,
+          marginVertical: 10,
+        }}
+        onPress={() => {
+          pdfGenerate();
+        }}>
+        <Text style={{color: 'white', marginLeft: 5}}>Export</Text>
+      </TouchableOpacity>
+      {/* </View> */}
       {input.show && (
         <DateTimePicker
           testID="dateTimePicker1"
@@ -323,14 +390,15 @@ const Message = ({navigation, user, route, getpdf}) => {
           onChange={input2.onChange1}
         />
       )}
-
-      {listitem == listitem && (
-        <FlatList
-          data={listitem}
-          renderItem={renderItem}
-          keyExtractor={item => item}
-        />
-      )}
+      {/* <PDFView source={{uri: 'file://' + pdfuri}} /> */}
+      <FlatList
+        data={listitem}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      />
+      {/* {listitem == listitem && (
+        
+      )} */}
       <Loading visible={loading} />
     </View>
   );
