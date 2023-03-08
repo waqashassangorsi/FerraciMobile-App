@@ -36,7 +36,6 @@ const Message = ({user, route, getpdf}) => {
   const {showmessage, showaddress} = route.params;
   const input = useInput(new Date());
   const input2 = useInput(new Date());
-  const filter = useInput();
   const [textdate, settextdate] = useState();
   const [textdateto, settextdateto] = useState();
   const [datetimestamp, setdatetimestamp] = useState();
@@ -47,9 +46,11 @@ const Message = ({user, route, getpdf}) => {
 
   const pdfGenerate = async id => {
     setLoading(true);
-    // const formData = new FormData();
-    // formData.append('text', JSON.stringify(listitem));
-    const res = await getpdf();
+    var myjson = JSON.stringify(listitem);
+    console.log('jsondata', myjson);
+    const formData = new FormData();
+    formData.append('messages', JSON.stringify(listitem));
+    const res = await getpdf(formData);
     console.log('firstjson', res);
     if (res.data.status == true) {
       Linking.openURL(res.data.data);
